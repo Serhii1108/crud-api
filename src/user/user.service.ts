@@ -1,3 +1,5 @@
+import { v4 as uuidv4 } from "uuid";
+
 import { Candidate, User } from "./user.model.js";
 
 class userService {
@@ -15,8 +17,16 @@ class userService {
     console.log("get user by id");
   }
 
-  async createUser(userCandidate: Candidate) {
-    console.log("Create user");
+  async createUser(userCandidate: Candidate): Promise<User> {
+    return new Promise((resolve) => {
+      const { username, age, hobbies } = userCandidate;
+      const id: UUIDType = uuidv4();
+
+      const user: User = { id, username, age, hobbies };
+
+      this.users.push(user);
+      resolve(user);
+    });
   }
 
   async updateUser(updatedUser: User) {
