@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "CRUD api",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "start:dev": "nodemon",
     "start:prod": "tsc && node dist/index.js",

@@ -21,7 +21,6 @@
     "prettier/prettier": "error",
     "eqeqeq": "error",
     "camelcase": "warn",
-    "no-console": "warn",
     "no-magic-numbers": "warn",
     "no-empty": "warn",
     "no-empty-function": "error"
