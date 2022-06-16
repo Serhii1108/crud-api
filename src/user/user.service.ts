@@ -7,8 +7,8 @@ class userService {
     this.users = [];
   }
 
-  async getAllUsers() {
-    console.log("get all users");
+  async getAllUsers(): Promise<User[]> {
+    return new Promise((resolve) => resolve(this.users));
   }
 
   async getUsersById(userId: UUIDType) {
