@@ -37,6 +37,28 @@ const server = http.createServer(
           });
           res.end("Error: Bad request");
         }
+      } else if (
+        req.url?.startsWith("/api/users/") &&
+        req.method === "DELETE"
+      ) {
+        const id: UUIDType | undefined = req.url.split("/").pop();
+        if (id) {
+          await userService.deleteUser(id).catch((errCode: number) => {
+            if (errCode === statusCodes.BAD_REQUEST) {
+              res.writeHead(statusCodes.BAD_REQUEST, {
+                "Content-Type": "text/plain",
+              });
+              res.end("Error: Bad request");
+            } else {
+              if (errCode === statusCodes.NOT_FOUND) {
+                res.writeHead(statusCodes.NOT_FOUND, {
+                  "Content-Type": "text/plain",
+                });
+                res.end("Error: User not found");
+              }
+            }
+          });
+        }
       }
 
       res.end();
