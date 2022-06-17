@@ -54,3 +54,11 @@ export const sendResponse = (
     return;
   }
 };
+
+export const checkError = (res: ServerResponse, errCode: number) => {
+  if (errCode === statusCodes.BAD_REQUEST) {
+    sendResponse(res, statusCodes.BAD_REQUEST);
+  } else if (errCode === statusCodes.NOT_FOUND) {
+    sendResponse(res, statusCodes.NOT_FOUND);
+  }
+};

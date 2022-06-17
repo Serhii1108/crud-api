@@ -14,8 +14,20 @@ class userService {
     return new Promise((resolve) => resolve(this.users));
   }
 
-  async getUsersById(userId: UUIDType) {
-    console.log("get user by id");
+  async getUsersById(userId: UUIDType): Promise<number | User> {
+    return new Promise((resolve, reject) => {
+      if (!uuidValidate(userId)) {
+        reject(statusCodes.BAD_REQUEST);
+      }
+
+      const user: User = this.users.filter((user) => user.id === userId)[0];
+
+      if (!user) {
+        reject(statusCodes.NOT_FOUND);
+      }
+
+      resolve(user);
+    }) as Promise<number | User>;
   }
 
   async createUser(userCandidate: Candidate): Promise<User> {

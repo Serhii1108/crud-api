@@ -5,7 +5,7 @@ import { statusCodes } from "./constants.js";
 import { Candidate, User } from "./user/user.model.js";
 import userService from "./user/user.service.js";
 import { getReqData } from "./utils/getReqData.js";
-import { sendResponse } from "./utils/response.js";
+import { checkError, sendResponse } from "./utils/response.js";
 import { validateUserCandidate } from "./utils/validateUser.js";
 
 const PORT = process.env.PORT || 8080;
@@ -18,6 +18,21 @@ const server = http.createServer(
         const users: User[] = await userService.getAllUsers();
         sendResponse(res, statusCodes.SUCCESS, users);
 
+        // Get one
+      } else if (req.url?.startsWith("/api/users/") && req.method === "GET") {
+        const id: UUIDType | undefined = req.url.split("/").pop();
+        if (id) {
+          await userService
+            .getUsersById(id)
+            .catch((errCode: number) => {
+              checkError(res, errCode);
+            })
+            .then((user: User | number | void) => {
+              if (typeof user === "object") {
+                sendResponse(res, statusCodes.SUCCESS, user);
+              }
+            });
+        }
         // Create
       } else if (req.url === "/api/users" && req.method === "POST") {
         const candidate: Candidate = (await getReqData(req)) as Candidate;
@@ -39,11 +54,7 @@ const server = http.createServer(
           await userService
             .deleteUser(id)
             .catch((errCode: number) => {
-              if (errCode === statusCodes.BAD_REQUEST) {
-                sendResponse(res, statusCodes.BAD_REQUEST);
-              } else if (errCode === statusCodes.NOT_FOUND) {
-                sendResponse(res, statusCodes.NOT_FOUND);
-              }
+              checkError(res, errCode);
             })
             .then(() => {
               sendResponse(res, statusCodes.DELETED);
