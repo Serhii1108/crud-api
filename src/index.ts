@@ -5,6 +5,7 @@ import { statusCodes } from "./constants.js";
 import { Candidate, User } from "./user/user.model.js";
 import userService from "./user/user.service.js";
 import { getReqData } from "./utils/getReqData.js";
+import { sendResponse } from "./utils/response.js";
 import { validateUserCandidate } from "./utils/validateUser.js";
 
 const PORT = process.env.PORT || 8080;
@@ -12,61 +13,47 @@ const PORT = process.env.PORT || 8080;
 const server = http.createServer(
   async (req: IncomingMessage, res: ServerResponse) => {
     try {
+      // Get all
       if (req.url === "/api/users" && req.method === "GET") {
         const users: User[] = await userService.getAllUsers();
+        sendResponse(res, statusCodes.SUCCESS, users);
 
-        res.writeHead(statusCodes.SUCCESS, {
-          "Content-Type": "application/json",
-        });
-
-        res.end(JSON.stringify(users));
+        // Create
       } else if (req.url === "/api/users" && req.method === "POST") {
         const candidate: Candidate = (await getReqData(req)) as Candidate;
 
         if (validateUserCandidate(candidate)) {
           const newUser: User = await userService.createUser(candidate);
-
-          res.writeHead(statusCodes.CREATED, {
-            "Content-Type": "application/json",
-          });
-
-          res.end(JSON.stringify(newUser));
+          sendResponse(res, statusCodes.CREATED, newUser);
         } else {
-          res.writeHead(statusCodes.BAD_REQUEST, {
-            "Content-Type": "text/plain",
-          });
-          res.end("Error: Bad request");
+          sendResponse(res, statusCodes.BAD_REQUEST);
         }
+
+        // Delete
       } else if (
         req.url?.startsWith("/api/users/") &&
         req.method === "DELETE"
       ) {
         const id: UUIDType | undefined = req.url.split("/").pop();
         if (id) {
-          await userService.deleteUser(id).catch((errCode: number) => {
-            if (errCode === statusCodes.BAD_REQUEST) {
-              res.writeHead(statusCodes.BAD_REQUEST, {
-                "Content-Type": "text/plain",
-              });
-              res.end("Error: Bad request");
-            } else {
-              if (errCode === statusCodes.NOT_FOUND) {
-                res.writeHead(statusCodes.NOT_FOUND, {
-                  "Content-Type": "text/plain",
-                });
-                res.end("Error: User not found");
+          await userService
+            .deleteUser(id)
+            .catch((errCode: number) => {
+              if (errCode === statusCodes.BAD_REQUEST) {
+                sendResponse(res, statusCodes.BAD_REQUEST);
+              } else if (errCode === statusCodes.NOT_FOUND) {
+                sendResponse(res, statusCodes.NOT_FOUND);
               }
-            }
-          });
+            })
+            .then(() => {
+              sendResponse(res, statusCodes.DELETED);
+            });
         }
       }
 
       res.end();
     } catch {
-      res.writeHead(statusCodes.SERVER_ERROR, {
-        "Content-Type": "text/plain",
-      });
-      res.end("Error: Internal server error");
+      sendResponse(res, statusCodes.SERVER_ERROR);
     }
   }
 );
