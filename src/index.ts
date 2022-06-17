@@ -32,6 +32,8 @@ const server = http.createServer(
                 sendResponse(res, statusCodes.SUCCESS, user);
               }
             });
+        } else {
+          sendResponse(res, statusCodes.BAD_REQUEST);
         }
         // Create
       } else if (req.url === "/api/users" && req.method === "POST") {
@@ -59,6 +61,8 @@ const server = http.createServer(
             .then(() => {
               sendResponse(res, statusCodes.DELETED);
             });
+        } else {
+          sendResponse(res, statusCodes.BAD_REQUEST);
         }
 
         // Update
@@ -80,9 +84,9 @@ const server = http.createServer(
         } else {
           sendResponse(res, statusCodes.BAD_REQUEST);
         }
+      } else {
+        sendResponse(res, statusCodes.NOT_FOUND);
       }
-
-      res.end();
     } catch {
       sendResponse(res, statusCodes.SERVER_ERROR);
     }

@@ -44,7 +44,7 @@ export const sendResponse = (
 
   // Not found
   if (statusCode === statusCodes.NOT_FOUND) {
-    serverResponse.end("Error: User not found");
+    serverResponse.end("Error: Not found");
     return;
   }
 
