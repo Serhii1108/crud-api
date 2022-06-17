@@ -60,6 +60,26 @@ const server = http.createServer(
               sendResponse(res, statusCodes.DELETED);
             });
         }
+
+        // Update
+      } else if (req.url?.startsWith("/api/users/") && req.method === "PUT") {
+        const id: UUIDType | undefined = req.url.split("/").pop();
+        const candidate: Candidate = (await getReqData(req)) as Candidate;
+
+        if (id && validateUserCandidate(candidate)) {
+          await userService
+            .updateUser(id, candidate)
+            .catch((errCode: number) => {
+              checkError(res, errCode);
+            })
+            .then((updatedUser: User | number | void) => {
+              if (typeof updatedUser === "object") {
+                sendResponse(res, statusCodes.SUCCESS, updatedUser);
+              }
+            });
+        } else {
+          sendResponse(res, statusCodes.BAD_REQUEST);
+        }
       }
 
       res.end();

@@ -42,8 +42,30 @@ class userService {
     });
   }
 
-  async updateUser(updatedUser: User) {
-    console.log("update user");
+  async updateUser(
+    userId: UUIDType,
+    updatedUser: Candidate
+  ): Promise<number | User> {
+    return new Promise((resolve, reject) => {
+      if (!uuidValidate(userId)) {
+        reject(statusCodes.BAD_REQUEST);
+      }
+
+      const userToUpdate: User = this.users.filter(
+        (user) => user.id === userId
+      )[0];
+
+      if (!userToUpdate) {
+        reject(statusCodes.NOT_FOUND);
+      }
+
+      const { username, age, hobbies } = updatedUser;
+      userToUpdate.username = username;
+      userToUpdate.age = age;
+      userToUpdate.hobbies = hobbies;
+
+      resolve(userToUpdate);
+    });
   }
 
   async deleteUser(userId: UUIDType): Promise<number> {
@@ -56,12 +78,12 @@ class userService {
         (user) => user.id === userId
       )[0];
 
-      if (userToDelete) {
-        this.users.splice(this.users.indexOf(userToDelete), 1);
-        resolve(statusCodes.SUCCESS);
-      } else {
+      if (!userToDelete) {
         reject(statusCodes.NOT_FOUND);
       }
+
+      this.users.splice(this.users.indexOf(userToDelete), 1);
+      resolve(statusCodes.SUCCESS);
     });
   }
 }

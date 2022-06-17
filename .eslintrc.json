@@ -21,7 +21,7 @@
     "prettier/prettier": "error",
     "eqeqeq": "error",
     "camelcase": "warn",
-    "no-magic-numbers": "warn",
+    "no-magic-numbers": ["error", {"ignore": [ 0, 1, 8080 ]}],
     "no-empty": "warn",
     "no-empty-function": "error"
   }
