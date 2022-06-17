@@ -5,8 +5,9 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start:dev": "nodemon",
+    "start:dev": "nodemon ./src/index.ts",
     "start:prod": "tsc && node dist/index.js",
+    "start:multi": "nodemon ./src/cluster.ts",
     "lint": "npx eslint \"src/**/*.ts\" --fix",
     "format": "npx prettier \"src/**/*.ts\" --write"
   },
