@@ -10,9 +10,9 @@ import { validateUserCandidate } from "./validateUser.js";
 
 export const PORT = process.env.PORT;
 
-export const createServer = (serverId: number) => {
-  http
-    .createServer(async (req: IncomingMessage, res: ServerResponse) => {
+export const createServer = (serverId: number): http.Server => {
+  return http.createServer(
+    async (req: IncomingMessage, res: ServerResponse) => {
       try {
         // Get all
         if (req.url === "/api/users" && req.method === "GET") {
@@ -91,8 +91,6 @@ export const createServer = (serverId: number) => {
       } catch {
         sendResponse(res, statusCodes.SERVER_ERROR);
       }
-    })
-    .listen(PORT, () => {
-      console.log(`Server ${serverId} started on port: ${PORT}`);
-    });
+    }
+  );
 };

@@ -1,3 +1,7 @@
-import { createServer } from "./utils/server.js";
+import { createServer, PORT } from "./utils/server.js";
 
-createServer(1);
+const serverId = 1;
+
+createServer(serverId).listen(PORT, () => {
+  console.log(`Server ${serverId} started on port: ${PORT}`);
+});

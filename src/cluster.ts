@@ -1,6 +1,6 @@
 import cluster from "cluster";
 import { cpus } from "os";
-import { createServer } from "./utils/server.js";
+import { createServer, PORT } from "./utils/server.js";
 
 const numCPUs = cpus().length;
 
@@ -11,7 +11,10 @@ const createClusters = () => {
     }
   } else {
     if (cluster.worker) {
-      createServer(cluster.worker.id);
+      const serverId = cluster.worker.id;
+      createServer(serverId).listen(PORT, () => {
+        console.log(`Server ${serverId} started on port: ${PORT}`);
+      });
     }
   }
 };
