@@ -1,11 +1,15 @@
 import { statusCodes } from "../constants.js";
 
-class logService {
+export class LogService {
   private totalReq: number;
   private successfulReq: number;
   private failedReq: number;
 
-  constructor() {
+  private serverId: number;
+
+  constructor(serverId: number) {
+    this.serverId = serverId;
+
     this.totalReq = 0;
     this.successfulReq = 0;
     this.failedReq = 0;
@@ -33,7 +37,7 @@ class logService {
 
   printStats() {
     console.log(
-      "\nStatistics:\n",
+      `\nStatistics(server ${this.serverId}):\n`,
       `Total requests: ${this.totalReq}\n`,
       `Successful requests: ${this.successfulReq}\n`,
       `Failed requests: ${this.failedReq}\n`
@@ -41,4 +45,4 @@ class logService {
   }
 }
 
-export default new logService();
+// export default logService();

@@ -5,15 +5,18 @@ import { statusCodes } from "../constants.js";
 import { User, Candidate } from "../user/user.model.js";
 import userService from "../user/user.service.js";
 import { getReqData } from "./getReqData.js";
-import logService from "./log.service.js";
+import { LogService } from "./log.service.js";
 import { sendResponse, checkError } from "./response.js";
 import { validateUserCandidate } from "./validateUser.js";
 
 export const PORT = process.env.PORT;
 
 export const createServer = (serverId: number): http.Server => {
+  const logService = new LogService(serverId);
+
   process.on("SIGINT", () => {
     logService.printStats();
+    process.exit();
   });
 
   return http.createServer(
@@ -34,7 +37,7 @@ export const createServer = (serverId: number): http.Server => {
             await userService
               .getUsersById(id)
               .catch((errCode: number) => {
-                checkError(serverId, req, res, errCode);
+                checkError(serverId, req, res, errCode, logService);
               })
               .then((user: User | number | void) => {
                 if (typeof user === "object") {
@@ -74,7 +77,7 @@ export const createServer = (serverId: number): http.Server => {
             await userService
               .deleteUser(id)
               .catch((errCode: number) => {
-                checkError(serverId, req, res, errCode);
+                checkError(serverId, req, res, errCode, logService);
               })
               .then((statusCode: number | void) => {
                 if (statusCode === statusCodes.DELETED) {
@@ -100,7 +103,7 @@ export const createServer = (serverId: number): http.Server => {
             await userService
               .updateUser(id, candidate)
               .catch((errCode: number) => {
-                checkError(serverId, req, res, errCode);
+                checkError(serverId, req, res, errCode, logService);
               })
               .then((updatedUser: User | number | void) => {
                 if (typeof updatedUser === "object") {

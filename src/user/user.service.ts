@@ -1,13 +1,21 @@
 import { v4 as uuidv4, validate as uuidValidate } from "uuid";
-import { statusCodes } from "../constants.js";
 
+import { statusCodes } from "../constants.js";
 import { Candidate, User } from "./user.model.js";
 
 class userService {
-  public users: User[];
+  private users: User[];
 
   constructor() {
     this.users = [];
+  }
+
+  get getUsers() {
+    return this.users;
+  }
+
+  set setUsers(users: User[]) {
+    this.users = users;
   }
 
   async getAllUsers(): Promise<User[]> {

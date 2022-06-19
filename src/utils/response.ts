@@ -1,7 +1,9 @@
 import { IncomingMessage, ServerResponse } from "http";
+
 import { statusCodes } from "../constants.js";
 import { User } from "../user/user.model.js";
-import logService from "./log.service.js";
+import userService from "../user/user.service.js";
+import { LogService } from "./log.service.js";
 
 export const sendResponse = (
   serverResponse: ServerResponse,
@@ -17,6 +19,10 @@ export const sendResponse = (
     serverResponse.writeHead(statusCode, {
       "Content-Type": "text/plain",
     });
+  }
+
+  if (process.send) {
+    process.send({ users: userService.getUsers });
   }
 
   // Success
@@ -60,7 +66,8 @@ export const checkError = (
   serverId: number,
   req: IncomingMessage,
   res: ServerResponse,
-  errCode: number
+  errCode: number,
+  logService: LogService
 ) => {
   if (errCode === statusCodes.BAD_REQUEST) {
     logService.printReq(serverId, req.method, statusCodes.BAD_REQUEST);
