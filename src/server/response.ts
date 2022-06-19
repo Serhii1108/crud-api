@@ -11,15 +11,9 @@ export const sendResponse = (
   body?: User | User[]
 ) => {
   // Write head
-  if ([statusCodes.SUCCESS, statusCodes.CREATED].includes(statusCode)) {
-    serverResponse.writeHead(statusCode, {
-      "Content-Type": "application/json",
-    });
-  } else {
-    serverResponse.writeHead(statusCode, {
-      "Content-Type": "text/plain",
-    });
-  }
+  serverResponse.writeHead(statusCode, {
+    "Content-Type": "application/json",
+  });
 
   if (process.send) {
     process.send({ users: userService.getUsers });
@@ -45,19 +39,21 @@ export const sendResponse = (
 
   // Bad request
   if (statusCode === statusCodes.BAD_REQUEST) {
-    serverResponse.end("Error: Bad request");
+    serverResponse.end(JSON.stringify({ message: "Error: Bad request" }));
     return;
   }
 
   // Not found
   if (statusCode === statusCodes.NOT_FOUND) {
-    serverResponse.end("Error: Not found");
+    serverResponse.end(JSON.stringify({ message: "Error: Not found" }));
     return;
   }
 
   // Server error
   if (statusCode === statusCodes.SERVER_ERROR) {
-    serverResponse.end("Error: Internal server error");
+    serverResponse.end(
+      JSON.stringify({ message: "Error: Internal server error" })
+    );
     return;
   }
 };

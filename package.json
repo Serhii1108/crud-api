@@ -8,6 +8,7 @@
     "start:dev": "nodemon ./src/index.ts",
     "start:prod": "tsc && node dist/index.js",
     "start:multi": "nodemon ./src/cluster.ts",
+    "build": "tsc",
     "test": "jest",
     "lint": "npx eslint \"src/**/*.ts\" --fix",
     "format": "npx prettier \"src/**/*.ts\" --write"

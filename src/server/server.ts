@@ -24,109 +24,154 @@ export const createServer = (serverId: number): http.Server => {
       try {
         // Get all
         if (req.url === "/api/users" && req.method === "GET") {
-          const users: User[] = await userService.getAllUsers();
-
-          logService.printReq(serverId, req.method, statusCodes.SUCCESS);
-
-          sendResponse(res, statusCodes.SUCCESS, users);
-
-          // Get one
-        } else if (req.url?.startsWith("/api/users/") && req.method === "GET") {
-          const id: UUIDType | undefined = req.url.split("/").pop();
-          if (id) {
-            await userService
-              .getUsersById(id)
-              .catch((errCode: number) => {
-                checkError(serverId, req, res, errCode, logService);
-              })
-              .then((user: User | number | void) => {
-                if (typeof user === "object") {
-                  logService.printReq(
-                    serverId,
-                    req.method,
-                    statusCodes.SUCCESS
-                  );
-                  sendResponse(res, statusCodes.SUCCESS, user);
-                }
-              });
-          } else {
-            logService.printReq(serverId, req.method, statusCodes.BAD_REQUEST);
-            sendResponse(res, statusCodes.BAD_REQUEST);
-          }
-          // Create
-        } else if (req.url === "/api/users" && req.method === "POST") {
-          const candidate: Candidate = (await getReqData(req)) as Candidate;
-
-          if (validateUserCandidate(candidate)) {
-            const newUser: User = await userService.createUser(candidate);
-
-            logService.printReq(serverId, req.method, statusCodes.CREATED);
-            sendResponse(res, statusCodes.CREATED, newUser);
-          } else {
-            logService.printReq(serverId, req.method, statusCodes.BAD_REQUEST);
-            sendResponse(res, statusCodes.BAD_REQUEST);
-          }
-
-          // Delete
-        } else if (
-          req.url?.startsWith("/api/users/") &&
-          req.method === "DELETE"
-        ) {
-          const id: UUIDType | undefined = req.url.split("/").pop();
-          if (id) {
-            await userService
-              .deleteUser(id)
-              .catch((errCode: number) => {
-                checkError(serverId, req, res, errCode, logService);
-              })
-              .then((statusCode: number | void) => {
-                if (statusCode === statusCodes.DELETED) {
-                  logService.printReq(
-                    serverId,
-                    req.method,
-                    statusCodes.DELETED
-                  );
-                  sendResponse(res, statusCodes.DELETED);
-                }
-              });
-          } else {
-            logService.printReq(serverId, req.method, statusCodes.BAD_REQUEST);
-            sendResponse(res, statusCodes.BAD_REQUEST);
-          }
-
-          // Update
-        } else if (req.url?.startsWith("/api/users/") && req.method === "PUT") {
-          const id: UUIDType | undefined = req.url.split("/").pop();
-          const candidate: Candidate = (await getReqData(req)) as Candidate;
-
-          if (id && validateUserCandidate(candidate)) {
-            await userService
-              .updateUser(id, candidate)
-              .catch((errCode: number) => {
-                checkError(serverId, req, res, errCode, logService);
-              })
-              .then((updatedUser: User | number | void) => {
-                if (typeof updatedUser === "object") {
-                  logService.printReq(
-                    serverId,
-                    req.method,
-                    statusCodes.SUCCESS
-                  );
-                  sendResponse(res, statusCodes.SUCCESS, updatedUser);
-                }
-              });
-          } else {
-            logService.printReq(serverId, req.method, statusCodes.BAD_REQUEST);
-            sendResponse(res, statusCodes.BAD_REQUEST);
-          }
-        } else {
-          logService.printReq(serverId, req.method, statusCodes.NOT_FOUND);
-          sendResponse(res, statusCodes.NOT_FOUND);
+          await getAllUsers(req, res, serverId, logService);
+          return;
         }
+
+        // Get user by id
+        if (req.url?.startsWith("/api/users/") && req.method === "GET") {
+          await getUsersById(req, res, serverId, logService);
+          return;
+        }
+
+        // Create
+        if (req.url === "/api/users" && req.method === "POST") {
+          await createUser(req, res, serverId, logService);
+          return;
+        }
+
+        // Delete
+        if (req.url?.startsWith("/api/users/") && req.method === "DELETE") {
+          await deleteUser(req, res, serverId, logService);
+          return;
+        }
+
+        // Update
+        if (req.url?.startsWith("/api/users/") && req.method === "PUT") {
+          await updateUser(req, res, serverId, logService);
+          return;
+        }
+        // non-existing endpoints
+        logService.printReq(serverId, req.method, statusCodes.NOT_FOUND);
+        sendResponse(res, statusCodes.NOT_FOUND);
       } catch {
         logService.printReq(serverId, req.method, statusCodes.SERVER_ERROR);
         sendResponse(res, statusCodes.SERVER_ERROR);
       }
     }
   );
+};
+
+const getAllUsers = async (
+  req: IncomingMessage,
+  res: ServerResponse,
+  serverId: number,
+  logService: LogService
+) => {
+  const users: User[] = await userService.getAllUsers();
+  logService.printReq(serverId, req.method, statusCodes.SUCCESS);
+  sendResponse(res, statusCodes.SUCCESS, users);
+};
+
+const getUsersById = async (
+  req: IncomingMessage,
+  res: ServerResponse,
+  serverId: number,
+  logService: LogService
+) => {
+  if (req.url) {
+    const id: UUIDType | undefined = req.url.split("/").pop();
+
+    if (id) {
+      await userService
+        .getUsersById(id)
+        .catch((errCode: number) => {
+          checkError(serverId, req, res, errCode, logService);
+        })
+        .then((user: User | number | void) => {
+          if (typeof user === "object") {
+            logService.printReq(serverId, req.method, statusCodes.SUCCESS);
+            sendResponse(res, statusCodes.SUCCESS, user);
+          }
+        });
+    } else {
+      logService.printReq(serverId, req.method, statusCodes.BAD_REQUEST);
+      sendResponse(res, statusCodes.BAD_REQUEST);
+    }
+  }
+};
+
+const createUser = async (
+  req: IncomingMessage,
+  res: ServerResponse,
+  serverId: number,
+  logService: LogService
+) => {
+  const candidate: Candidate = (await getReqData(req)) as Candidate;
+
+  if (validateUserCandidate(candidate)) {
+    const newUser: User = await userService.createUser(candidate);
+
+    logService.printReq(serverId, req.method, statusCodes.CREATED);
+    sendResponse(res, statusCodes.CREATED, newUser);
+  } else {
+    logService.printReq(serverId, req.method, statusCodes.BAD_REQUEST);
+    sendResponse(res, statusCodes.BAD_REQUEST);
+  }
+};
+
+const deleteUser = async (
+  req: IncomingMessage,
+  res: ServerResponse,
+  serverId: number,
+  logService: LogService
+) => {
+  if (req.url) {
+    const id: UUIDType | undefined = req.url.split("/").pop();
+    if (id) {
+      await userService
+        .deleteUser(id)
+        .catch((errCode: number) => {
+          checkError(serverId, req, res, errCode, logService);
+        })
+        .then((statusCode: number | void) => {
+          if (statusCode === statusCodes.DELETED) {
+            logService.printReq(serverId, req.method, statusCodes.DELETED);
+            sendResponse(res, statusCodes.DELETED);
+          }
+        });
+    } else {
+      logService.printReq(serverId, req.method, statusCodes.BAD_REQUEST);
+      sendResponse(res, statusCodes.BAD_REQUEST);
+    }
+  }
+};
+
+const updateUser = async (
+  req: IncomingMessage,
+  res: ServerResponse,
+  serverId: number,
+  logService: LogService
+) => {
+  if (req.url) {
+    const id: UUIDType | undefined = req.url.split("/").pop();
+    const candidate: Candidate = (await getReqData(req)) as Candidate;
+
+    if (id && validateUserCandidate(candidate)) {
+      await userService
+        .updateUser(id, candidate)
+        .catch((errCode: number) => {
+          checkError(serverId, req, res, errCode, logService);
+        })
+        .then((updatedUser: User | number | void) => {
+          if (typeof updatedUser === "object") {
+            logService.printReq(serverId, req.method, statusCodes.SUCCESS);
+            sendResponse(res, statusCodes.SUCCESS, updatedUser);
+          }
+        });
+    } else {
+      logService.printReq(serverId, req.method, statusCodes.BAD_REQUEST);
+      sendResponse(res, statusCodes.BAD_REQUEST);
+    }
+  }
 };
