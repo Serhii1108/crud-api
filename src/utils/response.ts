@@ -1,6 +1,7 @@
-import { ServerResponse } from "http";
+import { IncomingMessage, ServerResponse } from "http";
 import { statusCodes } from "../constants.js";
 import { User } from "../user/user.model.js";
+import logService from "./log.service.js";
 
 export const sendResponse = (
   serverResponse: ServerResponse,
@@ -55,10 +56,17 @@ export const sendResponse = (
   }
 };
 
-export const checkError = (res: ServerResponse, errCode: number) => {
+export const checkError = (
+  serverId: number,
+  req: IncomingMessage,
+  res: ServerResponse,
+  errCode: number
+) => {
   if (errCode === statusCodes.BAD_REQUEST) {
+    logService.printReq(serverId, req.method, statusCodes.BAD_REQUEST);
     sendResponse(res, statusCodes.BAD_REQUEST);
   } else if (errCode === statusCodes.NOT_FOUND) {
+    logService.printReq(serverId, req.method, statusCodes.NOT_FOUND);
     sendResponse(res, statusCodes.NOT_FOUND);
   }
 };

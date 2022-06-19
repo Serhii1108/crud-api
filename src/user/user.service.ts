@@ -80,10 +80,10 @@ class userService {
 
       if (!userToDelete) {
         reject(statusCodes.NOT_FOUND);
+      } else {
+        this.users.splice(this.users.indexOf(userToDelete), 1);
+        resolve(statusCodes.DELETED);
       }
-
-      this.users.splice(this.users.indexOf(userToDelete), 1);
-      resolve(statusCodes.SUCCESS);
     });
   }
 }
