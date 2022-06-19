@@ -1,7 +1,7 @@
 import request from "supertest";
 import { statusCodes } from "../constants.js";
-import { Candidate } from "../user/user.model.js";
-import { createServer, PORT } from "../utils/server.js";
+import { Candidate } from "../user/models/user.model.js";
+import { createServer, PORT } from "../server/server.js";
 
 const server = createServer(1).listen(PORT);
 

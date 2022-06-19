@@ -1,9 +1,9 @@
 import { IncomingMessage, ServerResponse } from "http";
 
 import { statusCodes } from "../constants.js";
-import { User } from "../user/user.model.js";
+import { User } from "../user/models/user.model.js";
 import userService from "../user/user.service.js";
-import { LogService } from "./log.service.js";
+import { LogService } from "../utils/log.service.js";
 
 export const sendResponse = (
   serverResponse: ServerResponse,

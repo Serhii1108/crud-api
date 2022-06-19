@@ -1,4 +1,4 @@
-import { Candidate } from "../user/user.model.js";
+import { Candidate } from "../user/models/user.model.js";
 
 export const validateUserCandidate = (user: Candidate) => {
   const username = user.username ? typeof user.username === "string" : false;

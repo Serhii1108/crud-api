@@ -1,4 +1,4 @@
-import { createServer, PORT } from "./utils/server.js";
+import { createServer, PORT } from "./server/server.js";
 
 const serverId = 1;
 

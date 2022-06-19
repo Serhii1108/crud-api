@@ -1,7 +1,7 @@
 import { v4 as uuidv4, validate as uuidValidate } from "uuid";
 
 import { statusCodes } from "../constants.js";
-import { Candidate, User } from "./user.model.js";
+import { Candidate, User } from "./models/user.model.js";
 
 class userService {
   private users: User[];

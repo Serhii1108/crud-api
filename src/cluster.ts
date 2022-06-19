@@ -1,8 +1,8 @@
 import cluster from "cluster";
 import { cpus } from "os";
 
-import { createServer, PORT } from "./utils/server.js";
-import { User } from "./user/user.model.js";
+import { createServer, PORT } from "./server/server.js";
+import { User } from "./user/models/user.model.js";
 import userService from "./user/user.service.js";
 
 const numCPUs = cpus().length;

@@ -2,12 +2,12 @@ import "dotenv/config";
 import http, { IncomingMessage, ServerResponse } from "http";
 
 import { statusCodes } from "../constants.js";
-import { User, Candidate } from "../user/user.model.js";
+import { User, Candidate } from "../user/models/user.model.js";
 import userService from "../user/user.service.js";
-import { getReqData } from "./getReqData.js";
-import { LogService } from "./log.service.js";
+import { getReqData } from "../utils/getReqData.js";
+import { LogService } from "../utils/log.service.js";
 import { sendResponse, checkError } from "./response.js";
-import { validateUserCandidate } from "./validateUser.js";
+import { validateUserCandidate } from "../utils/validateUser.js";
 
 export const PORT = process.env.PORT;
 
