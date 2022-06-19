@@ -15,6 +15,7 @@
 
 ## Useful information
 
+- An instance of the server is created during the tests, so you do NOT need to run the server in parallel in another terminal
 - When you stop the app(Ctrl+C), statistics are printed in the console
 - Logs is printing in the console
 - Server port: `8080`
